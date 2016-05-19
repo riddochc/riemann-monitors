@@ -1,0 +1,98 @@
+#!/usr/bin/env ruby
+
+# Checks the status of an HTTP request and submits it to Riemann
+require File.expand_path("../../lib/riemann/tools", __FILE__)
+
+class Riemann::Tools::HTTPStatus
+  include Riemann::Tools
+  require "net/http"
+  require "uri"
+
+  opt :uri, "Target URI", default: 'http://localhost/'
+  opt :sitename, "Site name (abbreviation for identifying uri)", type: String
+  opt :method, "HTTP Method (get, head)", default: "head"
+
+  def initialize
+    @uri = URI.parse(opts[:uri])
+    @sitename = opts[:sitename].gsub(/\//, '_')
+    @servicename = ["http", opts[:method], @sitename].join("/")
+    @verbclass = case opts[:method]
+    when /\Aget\z/i
+      Net::HTTP::Get
+    when /\Ahead\z/i
+      Net::HTTP::Head
+    else
+      raise "This script only makes sense with get and head methods. You might want a custom script."
+    end
+  end
+
+  def tick
+    response, roundtrip = get_connection()
+    unless (response).nil?
+      metrics = Hash.new
+      c = response.code&.to_i
+      if c.nil?
+        metrics["code"] = -1
+      else
+        metrics["code"] = response.code
+      end
+      if !roundtrip.nil?
+        metrics["roundtrip"] = roundtrip
+      end
+      if !response.body.nil? && @verbclass != Net::HTTP::Head
+        metrics["body_length"] = response.body.length
+      end
+      report_metrics(metrics)
+    end
+  end
+
+  def report_metrics(metrics)
+    metrics.each do |k, v|
+      if k == "roundtrip"
+        m = v.to_f
+      else
+        m = v.to_i
+      end
+
+      report(
+        :service  => "#{@servicename}/#{k}",
+        :metric   => m,
+        :state    => "ok",
+        :tags     => ["http", k]
+      )
+    end
+  end
+
+  def get_connection()
+    response = nil
+    roundtrip = nil
+    begin
+      p1 = Time.now
+      Net::HTTP.start(@uri.host, @uri.port) do |http|
+        http.open_timeout = opts[:timeout]
+        request = @verbclass.new(@uri)
+        response = http.request(request)
+        response.read_body
+      end
+      p2 = Time.now
+      roundtrip = p2 - p1
+    rescue => e
+      report(
+        :service     => @servicename,
+        :state       => "critical",
+        :description => "http connection failure: #{e.class} - #{e.message}",
+        :tags        => ["http", "action"]
+      )
+    else
+      report(
+        :service     => @servicename,
+        :state       => "ok",
+        :description => "http connection success",
+        :tags        => ["http", "action"]
+      )
+    end
+    [response, roundtrip]
+  end
+end
+
+Riemann::Tools::HTTPStatus.run
