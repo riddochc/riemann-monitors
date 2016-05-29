@@ -1,0 +1,75 @@
+= riemann-monitors
+Chris Riddoch <riddochc@gmail.com>
+:language: ruby
+:homepage: https://github.com/riddochc/riemann-tools
+:revnumber: 0.1
+:revdate: 2016-05-29
+
+== Description
+
+Tiny programs to submit events to Riemann.
+
+This is a polite fork of riemann-tools, using my riemann-ruby-experiments gem
+instead of riemann-ruby-client.  As a result, events can be batched together
+to be sent in one message to a Riemann server.  Additionally, more control
+over the TCP socket options is given, and UDP is less supported as a result
+of that gem's use of net_ruby_client.
+
+== Requirements
+
+* Ruby 2.0 or higher (currently only tested on 2.3)
+* A riemann server to talk to
+
+== Installation
+
+  gem install riemann-monitors
+
+== Use
+
+  riemann-health
+
+This defaults to connecting to a Riemann server listening on 127.0.0.1, TCP port 5555.
+
+== Riemann-tools programs
+
+This repository contains a number of different programs, mostly identical to those
+in `riemann-tools`.
+
+riemann-httpstatus:: Monitoring results of periodic HTTP requests.
+riemann-apache-status:: Apache monitoring.
+riemann-dir-files-count:: File counts.
+riemann-freeswitch:: FreeSwitch monitoring.
+riemann-memcached:: Monitor Memcache.
+riemann-proc:: Linux process monitoring.
+riemann-bench:: Load testing for Riemann.
+riemann-dir-space:: Directory space monitoring.
+riemann-haproxy:: Monitor HAProxy.
+riemann-net:: Network interface monitoring.
+riemann-varnish:: Monitor Varnish.
+riemann-cloudant:: Cloudant monitoring.
+riemann-diskstats:: Disk statistics.
+riemann-health:: General CPU, memory, disk and load monitoring.
+riemann-nginx-status:: Monitor Nginx.
+riemann-zookeeper:: Monitor Zookeeper.
+riemann-consul:: Monitor Consul.
+riemann-fd:: Linux file descriptor use.
+riemann-kvminstance:: Monitor KVM instances.
+riemann-ntp:: Monitor NTP
+
+The "stand-alone" tools offered in `riemann-tools` aren't included for now.
+
+== Contributing
+
+Pull requests, please.
+
+== Contributors
+
+  git shortlog -n
+
+== License
+
+The MIT License
+
+Copyright (c) 2016 Chris Riddoch
+Copyright (c) 2011-2016 Kyle Kingsbury
+
