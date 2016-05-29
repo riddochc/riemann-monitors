@@ -1,5 +1,3 @@
-require 'openssl'
-
 class Hash
   def has_keys?(*rest)
     rest.all? {|k| self.has_key?(k) }
@@ -8,9 +6,6 @@ end
 
 module Riemann
   module Monitors
-    require 'trollop'
-    require 'riemann-ruby-experiments'
-
     def self.included(base)
       base.instance_eval do
         def run
