@@ -22,7 +22,7 @@ gemspec = Gem::Specification.new do |s|
   s.description = 'Utilities which submit events to Riemann.'
   s.license = 'MIT'
 
-  s.add_dependency 'riemann-client', '>= 0.2.2'
+  s.add_dependency 'riemann-ruby-experiments'
   s.add_dependency 'trollop', '>= 1.16.2'
   s.add_dependency 'json'
 

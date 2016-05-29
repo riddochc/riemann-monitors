@@ -1,7 +1,8 @@
+require 'pry'
 module Riemann
   module Tools
     require 'trollop'
-    require 'riemann/client'
+    require 'riemann-ruby-experiments'
 
     def self.included(base)
       base.instance_eval do
@@ -52,34 +53,20 @@ module Riemann
       end]
     end
 
-    def report(event)
-      if options[:tag]
-        # Work around a bug with beefcake which can't take frozen strings.
-        event[:tags] = [*event.fetch(:tags, [])] + options[:tag].map(&:dup)
-      end
-
-      event[:ttl] ||= (options[:ttl] || (options[:interval] * 2))
-
-      if options[:event_host]
-        event[:host] = options[:event_host].dup
-      end
-
-      event = event.merge(attributes)
-
-      riemann << event
+    def report(event_hash)
+      event_hash[:tags] = [options[:tag]] + (event_hash[:tags] || [])
+      event_hash[:ttl] ||= (options[:ttl] || (options[:interval] * 2))
+      event_hash[:host] ||= options[:event_host]
+      event_hash.merge!(attributes)
+      riemann.add_event(event_hash)
     end
 
     def new_riemann_client
-      r = Riemann::Client.new(
-        :host    => options[:host],
-        :port    => options[:port],
-        :timeout => options[:timeout]
-      )
-      if options[:tcp]
-        r.tcp
-      else
-        r
-      end
+      riemann_options = {
+        :server  => "#{options[:host]}:#{options[:port]}",
+        :connect_timeout => options[:timeout]
+      }
+      Riemann::Experiment::Client.new(riemann_options)
     end
 
     def riemann
@@ -92,6 +79,7 @@ module Riemann
       loop do
         begin
           tick
+          riemann.send_message(ok: true)
         rescue => e
           $stderr.puts "#{e.class} #{e}\n#{e.backtrace.join "\n"}"
         end
