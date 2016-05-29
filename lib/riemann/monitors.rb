@@ -37,6 +37,7 @@ module Riemann
         opt :attribute, "Attribute to add to the event", :type => String, :multi => true
         opt :timeout, "Timeout (in seconds) when waiting for acknowledgements", :default => 30
         opt :tcp, "Use TCP transport instead of UDP (improves reliability, slight overhead.", :default => true
+        opt :ssl, "Use SSL.", default: false
         opt :ssl_ca_file, "SSL certificate authority cert", :default => File.join(Dir.home, ".config", "riemann-tools", "ca.crt")
         opt :ssl_cert_file, "SSL client certificate public key", :default => File.join(Dir.home, ".config", "riemann-tools", "#{Socket.gethostname}.crt")
         opt :ssl_key_file, "SSL client certificate private key", :default => File.join(Dir.home, ".config", "riemann-tools", "#{Socket.gethostname}.key")
@@ -71,7 +72,7 @@ module Riemann
         :server  => "#{options[:host]}:#{options[:port]}",
         :connect_timeout => options[:timeout]
       }
-      if options.has_keys?(:ssl_ca_file, :ssl_cert_file, :ssl_key_file)
+      if options.has_keys?(:ssl_ca_file, :ssl_cert_file, :ssl_key_file) && options[:ssl]
         # These are given to OpenSSL::SSL::SSLContext
         riemann_options[:ssl] = {
           ca_file: File.expand_path(options[:ssl_ca_file]),
