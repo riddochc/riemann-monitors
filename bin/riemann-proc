@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Proc
-  include Riemann::Tools
+class Riemann::Monitors::Proc
+  include Riemann::Monitors
 
   opt :proc_regex, "regular expression that matches the process to be monitored", type: :string, :default => ".*"
   opt :proc_min_critical, "running process count minimum", :default => 0
@@ -105,4 +105,4 @@ class Riemann::Tools::Proc
   end
 end
 
-Riemann::Tools::Proc.run
+Riemann::Monitors::Proc.run

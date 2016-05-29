@@ -7,8 +7,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::ApacheStatus
-  include Riemann::Tools
+class Riemann::Monitors::ApacheStatus
+  include Riemann::Monitors
   require 'net/http'
   require 'uri'
 
@@ -95,4 +95,4 @@ class Riemann::Tools::ApacheStatus
 
 end
 
-Riemann::Tools::ApacheStatus.run
+Riemann::Monitors::ApacheStatus.run

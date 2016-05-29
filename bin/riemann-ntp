@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Ntp
-  include Riemann::Tools
+class Riemann::Monitors::Ntp
+  include Riemann::Monitors
 
   def initialize
     @hostname = `hostname`.chomp
@@ -35,4 +35,4 @@ class Riemann::Tools::Ntp
   end
 end
 
-Riemann::Tools::Ntp.run
+Riemann::Monitors::Ntp.run

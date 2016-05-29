@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::DirSpace
-  include Riemann::Tools
+class Riemann::Monitors::DirSpace
+  include Riemann::Monitors
 
   opt :directory, "", :default => '/var/log'
   opt :service_prefix, "The first part of the service name, before the directory path", :default => "dir-space"
@@ -52,4 +52,4 @@ class Riemann::Tools::DirSpace
   end
 end
 
-Riemann::Tools::DirSpace.run
+Riemann::Monitors::DirSpace.run

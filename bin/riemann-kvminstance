@@ -2,8 +2,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::KVM
-  include Riemann::Tools
+class Riemann::Monitors::KVM
+  include Riemann::Monitors
 
   def tick
 
@@ -19,4 +19,4 @@ class Riemann::Tools::KVM
   end
 end
 
-Riemann::Tools::KVM.run
+Riemann::Monitors::KVM.run

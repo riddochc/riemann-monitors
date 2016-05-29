@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Health
-  include Riemann::Tools
+class Riemann::Monitors::Health
+  include Riemann::Monitors
 
   opt :cpu_warning, "CPU warning threshold (fraction of total jiffies)", :default => 0.9
   opt :cpu_critical, "CPU critical threshold (fraction of total jiffies)", :default => 0.95
@@ -286,4 +286,4 @@ class Riemann::Tools::Health
   end
 end
 
-Riemann::Tools::Health.run
+Riemann::Monitors::Health.run

@@ -5,8 +5,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Health
-  include Riemann::Tools
+class Riemann::Monitors::Health
+  include Riemann::Monitors
 
   opt :fd_sys_warning, "open file descriptor threshold for system", :default => 800
   opt :fd_sys_critical, "open file descriptor critical threshold for system", :default => 900
@@ -63,4 +63,4 @@ class Riemann::Tools::Health
   end
 end
 
-Riemann::Tools::Health.run
+Riemann::Monitors::Health.run

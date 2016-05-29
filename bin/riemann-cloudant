@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Cloudant
-  include Riemann::Tools
+class Riemann::Monitors::Cloudant
+  include Riemann::Monitors
   require 'net/http'
   require 'json'
 
@@ -55,4 +55,4 @@ class Riemann::Tools::Cloudant
 
 end
 
-Riemann::Tools::Cloudant.run
+Riemann::Monitors::Cloudant.run

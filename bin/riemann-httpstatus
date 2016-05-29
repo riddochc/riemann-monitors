@@ -3,8 +3,8 @@
 # Checks the status of an HTTP request and submits it to Riemann
 require File.expand_path("../../lib/riemann/tools", __FILE__)
 
-class Riemann::Tools::HTTPStatus
-  include Riemann::Tools
+class Riemann::Monitors::HTTPStatus
+  include Riemann::Monitors
   require "net/http"
   require "uri"
 
@@ -69,4 +69,4 @@ class Riemann::Tools::HTTPStatus
   end
 end
 
-Riemann::Tools::HTTPStatus.run
+Riemann::Monitors::HTTPStatus.run

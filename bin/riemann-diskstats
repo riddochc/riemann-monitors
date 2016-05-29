@@ -3,8 +3,8 @@
 require 'rubygems'
 require 'riemann/tools'
 
-class Riemann::Tools::Diskstats
-  include Riemann::Tools
+class Riemann::Monitors::Diskstats
+  include Riemann::Monitors
 
   opt :devices, "Devices to monitor", :type => :strings, :default => nil
   opt :ignore_devices, "Devices to ignore", :type => :strings, :default =>nil
@@ -92,4 +92,4 @@ class Riemann::Tools::Diskstats
   end
 end
 
-Riemann::Tools::Diskstats.run
+Riemann::Monitors::Diskstats.run

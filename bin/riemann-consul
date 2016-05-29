@@ -8,8 +8,8 @@ require 'net/http'
 require 'uri'
 require 'json'
 
-class Riemann::Tools::ConsulHealth
-  include Riemann::Tools
+class Riemann::Monitors::ConsulHealth
+  include Riemann::Monitors
 
   opt :consul_host, "Consul API Host (default to localhost)", :default => "localhost"
   opt :consul_port, "Consul API Host (default to 8500)", :default => "8500"
@@ -103,4 +103,4 @@ class Riemann::Tools::ConsulHealth
   end
 end
 
-Riemann::Tools::ConsulHealth.run
+Riemann::Monitors::ConsulHealth.run

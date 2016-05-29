@@ -2,8 +2,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::FreeSWITCH
-  include Riemann::Tools
+class Riemann::Monitors::FreeSWITCH
+  include Riemann::Monitors
 
   opt :calls_warning, "Calls warning threshold", :default => 100
   opt :calls_critical, "Calls critical threshold", :default => 300
@@ -116,4 +116,4 @@ class Riemann::Tools::FreeSWITCH
   end
 end
 
-Riemann::Tools::FreeSWITCH.run
+Riemann::Monitors::FreeSWITCH.run

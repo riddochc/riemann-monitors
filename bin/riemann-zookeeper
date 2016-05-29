@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Zookeeper
-  include Riemann::Tools
+class Riemann::Monitors::Zookeeper
+  include Riemann::Monitors
   require 'socket'
 
   opt :zookeeper_host, "Zookeeper hostname", :default => 'localhost'
@@ -38,4 +38,4 @@ class Riemann::Tools::Zookeeper
   end
 end
 
-Riemann::Tools::Zookeeper.run
+Riemann::Monitors::Zookeeper.run

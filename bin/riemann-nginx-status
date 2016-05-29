@@ -5,8 +5,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::NginxStatus
-  include Riemann::Tools
+class Riemann::Monitors::NginxStatus
+  include Riemann::Monitors
   require 'net/http'
   require 'uri'
 
@@ -81,4 +81,4 @@ class Riemann::Tools::NginxStatus
   end
 end
 
-Riemann::Tools::NginxStatus.run
+Riemann::Monitors::NginxStatus.run

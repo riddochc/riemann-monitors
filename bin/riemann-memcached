@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Memcached
-  include Riemann::Tools
+class Riemann::Monitors::Memcached
+  include Riemann::Monitors
   require 'socket'
 
   opt :memcached_host, "Memcached hostname", :default => 'localhost'
@@ -34,4 +34,4 @@ class Riemann::Tools::Memcached
   end
 end
 
-Riemann::Tools::Memcached.run
+Riemann::Monitors::Memcached.run

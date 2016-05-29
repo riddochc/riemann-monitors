@@ -5,8 +5,8 @@
 require 'open3'
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Varnish
-  include Riemann::Tools
+class Riemann::Monitors::Varnish
+  include Riemann::Monitors
 
   opt :varnish_host, "Varnish hostname", :default => `hostname`.chomp
 
@@ -51,4 +51,4 @@ class Riemann::Tools::Varnish
   end
 end
 
-Riemann::Tools::Varnish.run
+Riemann::Monitors::Varnish.run

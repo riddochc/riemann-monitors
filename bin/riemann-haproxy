@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::Haproxy
-  include Riemann::Tools
+class Riemann::Monitors::Haproxy
+  include Riemann::Monitors
   require 'net/http'
   require 'csv'
 
@@ -55,4 +55,4 @@ class Riemann::Tools::Haproxy
 
 end
 
-Riemann::Tools::Haproxy.run
+Riemann::Monitors::Haproxy.run

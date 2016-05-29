@@ -4,8 +4,8 @@
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
 
-class Riemann::Tools::DirFilesCount
-  include Riemann::Tools
+class Riemann::Monitors::DirFilesCount
+  include Riemann::Monitors
 
   opt :directory, "", :default => '/var/log'
   opt :service_prefix, "The first part of the service name, before the directory path", :default => "dir-files-count"
@@ -52,4 +52,4 @@ class Riemann::Tools::DirFilesCount
   end
 end
 
-Riemann::Tools::DirFilesCount.run
+Riemann::Monitors::DirFilesCount.run
