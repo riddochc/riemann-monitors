@@ -5,7 +5,7 @@
 
 # Removes whitespace from 'Total Accesses' and 'Total kBytes' for output to graphite
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::ApacheStatus
   include Riemann::Monitors
