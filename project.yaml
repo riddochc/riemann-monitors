@@ -1,0 +1,12 @@
+---
+name: "riemann-monitors"
+toplevel_module: Riemann::Monitors
+dependencies:
+  riemann-ruby-experiments: ">= 0.0.2"
+  trollop: ">= 1.16.2"
+  json: ">= 1.8.3"
+dev_dependencies:
+  rake: ">=10.3"
+  yard: "~> 0.8.7"
+  asciidoctor: "~> 1.5.2"
+
