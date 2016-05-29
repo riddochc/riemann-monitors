@@ -1,4 +1,12 @@
 require 'pry'
+require 'openssl'
+
+class Hash
+  def has_keys?(*rest)
+    rest.all? {|k| self.has_key?(k) }
+  end
+end
+
 module Riemann
   module Tools
     require 'trollop'
@@ -35,6 +43,9 @@ module Riemann
         opt :attribute, "Attribute to add to the event", :type => String, :multi => true
         opt :timeout, "Timeout (in seconds) when waiting for acknowledgements", :default => 30
         opt :tcp, "Use TCP transport instead of UDP (improves reliability, slight overhead.", :default => true
+        opt :ssl_ca_file, "SSL certificate authority cert", :default => File.join(Dir.home, ".config", "riemann-tools", "ca.crt")
+        opt :ssl_cert_file, "SSL client certificate public key", :default => File.join(Dir.home, ".config", "riemann-tools", "#{Socket.gethostname}.crt")
+        opt :ssl_key_file, "SSL client certificate private key", :default => File.join(Dir.home, ".config", "riemann-tools", "#{Socket.gethostname}.key")
       end
     end
 
@@ -66,6 +77,16 @@ module Riemann
         :server  => "#{options[:host]}:#{options[:port]}",
         :connect_timeout => options[:timeout]
       }
+      if options.has_keys?(:ssl_ca_file, :ssl_cert_file, :ssl_key_file)
+        # These are given to OpenSSL::SSL::SSLContext
+        riemann_options[:ssl] = {
+          ca_file: File.expand_path(options[:ssl_ca_file]),
+          cert:    OpenSSL::X509::Certificate.new(File.read(File.expand_path(options[:ssl_cert_file]))),
+          key:     OpenSSL::PKey::RSA.new(File.read(File.expand_path(options[:ssl_key_file]))),
+          verify_mode: OpenSSL::SSL::VERIFY_PEER,
+          ssl_version: :TLSv1_2
+        }
+      end
       Riemann::Experiment::Client.new(riemann_options)
     end
 
