@@ -48,13 +48,13 @@ module Riemann
       @attributes ||= Hash[options[:attribute].map do |attr|
         k,v = attr.split(/=/)
         if k and v
-          [k,v]
+          [k.to_sym,v]
         end
       end]
     end
 
     def report(event_hash)
-      event_hash[:tags] = [options[:tag]] + (event_hash[:tags] || [])
+      event_hash[:tags] = (event_hash[:tags] || []) + (options[:tag] || [])
       event_hash[:ttl] ||= (options[:ttl] || (options[:interval] * 2))
       event_hash[:host] ||= options[:event_host]
       event_hash.merge!(attributes)
