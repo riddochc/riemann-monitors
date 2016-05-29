@@ -8,7 +8,7 @@ class Hash
 end
 
 module Riemann
-  module Tools
+  module Monitors
     require 'trollop'
     require 'riemann-ruby-experiments'
 
