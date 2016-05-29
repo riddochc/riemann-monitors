@@ -29,37 +29,20 @@ class Riemann::Tools::HTTPStatus
   def tick
     response, roundtrip = get_connection()
     unless (response).nil?
-      metrics = Hash.new
+      metrics = {:service => @servicename,
+                 :tags => ["http"]}
       c = response.code&.to_i
-      if c.nil?
-        metrics["code"] = -1
-      else
-        metrics["code"] = response.code
+      if !c.nil?
+        metrics[:state] = "ok"
+        metrics[:metric] = c
       end
       if !roundtrip.nil?
-        metrics["roundtrip"] = roundtrip
+        metrics[:roundtrip] = roundtrip
       end
       if !response.body.nil? && @verbclass != Net::HTTP::Head
-        metrics["body_length"] = response.body.length
+        metrics[:body_length] = response.body.length
       end
-      report_metrics(metrics)
-    end
-  end
-
-  def report_metrics(metrics)
-    metrics.each do |k, v|
-      if k == "roundtrip"
-        m = v.to_f
-      else
-        m = v.to_i
-      end
-
-      report(
-        :service  => "#{@servicename}/#{k}",
-        :metric   => m,
-        :state    => "ok",
-        :tags     => ["http", k]
-      )
+      report(metrics)
     end
   end
 
@@ -77,19 +60,10 @@ class Riemann::Tools::HTTPStatus
       p2 = Time.now
       roundtrip = p2 - p1
     rescue => e
-      report(
-        :service     => @servicename,
-        :state       => "critical",
-        :description => "http connection failure: #{e.class} - #{e.message}",
-        :tags        => ["http", "action"]
-      )
-    else
-      report(
-        :service     => @servicename,
-        :state       => "ok",
-        :description => "http connection success",
-        :tags        => ["http", "action"]
-      )
+      report(:service     => @servicename,
+             :state       => "critical",
+             :description => "http connection failure: #{e.class} - #{e.message}",
+             :tags        => ["http", "action"])
     end
     [response, roundtrip]
   end
