@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
-#
-require 'rubygems'
-require 'riemann/tools'
+
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Diskstats
   include Riemann::Monitors
@@ -90,6 +89,7 @@ class Riemann::Monitors::Diskstats
 
     @old_state = state
   end
+
 end
 
 Riemann::Monitors::Diskstats.run

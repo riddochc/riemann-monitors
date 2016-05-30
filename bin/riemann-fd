@@ -3,7 +3,7 @@
 # Reports current file descriptor use to riemann.
 # By default reports the total system fd usage, can also report usage of individual processes
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Health
   include Riemann::Monitors

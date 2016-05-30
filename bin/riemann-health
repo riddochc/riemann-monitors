@@ -2,7 +2,7 @@
 
 # Reports current CPU, disk, load average, and memory use to riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Health
   include Riemann::Monitors

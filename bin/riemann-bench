@@ -3,18 +3,18 @@
 # Connects to a server (first arg) and populates it with a constant stream of
 # events for testing.
 
-require 'rubygems'
-require 'riemann/client'
+require_relative "../lib/riemann-monitors"
 require 'pp'
 
-class Riemann::Bench
+class Riemann::Monitors::Bench
+  include Riemann::Monitors
+
   attr_accessor :client, :hosts, :services, :states
   def initialize
     @hosts = [nil] + (0...10).map { |i| "host#{i}" }
     @hosts = %w(a b c d e f g h i j)
     @services = %w(test1 test2 test3 foo bar baz xyzzy attack cat treat)
     @states = {}
-    @client = Riemann::Client.new(:host => (ARGV.first || 'localhost'))
   end
 
   def evolve(state)
@@ -37,8 +37,9 @@ class Riemann::Bench
       :service => state[:service],
       :description => "at #{Time.now}"
     }
+
   end
-  
+
   def tick
 #    pp @states
     hosts.product(services).each do |id|

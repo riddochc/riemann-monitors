@@ -3,7 +3,7 @@
 # Reports varnish stats to Riemann.
 
 require 'open3'
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Varnish
   include Riemann::Monitors

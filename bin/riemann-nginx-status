@@ -3,7 +3,7 @@
 # Gathers nginx status stub statistics and submits them to Riemann.
 # See http://wiki.nginx.org/HttpStubStatusModule for configuring Nginx appropriately
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::NginxStatus
   include Riemann::Monitors

@@ -2,7 +2,7 @@
 
 # Gathers zookeeper STATS and submits them to Riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Zookeeper
   include Riemann::Monitors

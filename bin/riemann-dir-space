@@ -2,7 +2,7 @@
 
 # Gathers the space used by a directory and submits it to riemann
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::DirSpace
   include Riemann::Monitors

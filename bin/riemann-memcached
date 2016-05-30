@@ -2,7 +2,7 @@
 
 # Gathers memcached STATS and submits them to Riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Memcached
   include Riemann::Monitors
@@ -13,6 +13,7 @@ class Riemann::Monitors::Memcached
 
   def tick
     sock = TCPSocket.new(opts[:memcached_host], opts[:memcached_port])
+
     sock.print("stats\r\n")
     sock.flush
     stats = sock.gets
@@ -24,7 +25,7 @@ class Riemann::Monitors::Memcached
       m = stats.match /STAT (\w+) (\S+)/
       report(
              :host => opts[:memcached_host].dup,
-             :service => "memcached #{m[1]}",
+             :service => "memcached/#{m[1]}",
              :metric => m[2].to_f,
              :state => 'ok',
              :tags => ['memcached']
