@@ -2,13 +2,13 @@
 
 # Reports NTP stats to Riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require_relative "../lib/riemann-monitors"
 
 class Riemann::Monitors::Ntp
   include Riemann::Monitors
 
   def initialize
-    @hostname = `hostname`.chomp
+    @hostname = Socket.gethostname
   end
 
   def tick
@@ -24,14 +24,11 @@ class Riemann::Monitors::Ntp
   end
 
   def send(type,metric)
-      report(
-        :host => @hostname,
-        :service => "ntp peer #{@ntp_host} #{type}",
-        :metric => metric.to_f,
-        :state => "ok",
-        :description => "ntp peer #{@ntp_host} #{type}",
-        :tags => ["ntp"]
-      )
+      report(host: @hostname,
+            service: "ntp/#{type}",
+            metric: metric.to_f,
+            description: @ntp_host.to_s,
+            tags: ["ntp"])
   end
 end
 
