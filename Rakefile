@@ -34,7 +34,7 @@ if dev_dependencies.nil?
   dev_dependencies = {}
 end
 license = config.fetch('license') { "LGPL-3.0" }
-
+executables = Dir.glob(File.join(__dir__, "bin", "*")).map {|f| File.basename(f) }
 #["rake", "asciidoctor", "yard", "pry", "rspec", "rspec-sequel-formatter", "#{project}-tests"]
 ["rake", "asciidoctor", "yard", "pry", "rspec"].each do |dep|
   dev_dependencies[dep] = dev_dependencies.fetch(dep) {|d| "=#{installed_gem_version(d)}" }
@@ -53,6 +53,8 @@ Gem::Specification.new do |s|
   s.date        = "<%= Date.today %>"
   s.files       = [<%= all_files.map{|f| '"' + f + '"' }.join(",\n                   ") %>]
   s.homepage    = "<%= adoc.attributes['homepage'] %>"
+  s.bindir      = "bin"
+  s.executables = [<%= executables.map{|f| '"' + f + '"' }.join(",\n                   ") %>]
 
 % dependencies.each_pair do |req, vers|
   s.add_dependency "<%= req %>", "<%= vers %>"

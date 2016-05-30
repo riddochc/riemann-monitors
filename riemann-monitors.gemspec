@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.description = "This is a polite fork of riemann-tools, using my riemann-ruby-experiments gem instead of riemann-ruby-client.  As a result, events can be batched together to be sent in one message to a Riemann server.  Additionally, more control over the TCP socket options is given, and UDP is less supported as a result of that gem&#8217;s use of net_ruby_client."
   s.authors     = ["Chris Riddoch"]
   s.email       = "riddochc@gmail.com"
-  s.date        = "2016-05-29"
+  s.date        = "2016-05-30"
   s.files       = ["Gemfile",
                    "LICENSE",
                    "README.adoc",
@@ -39,6 +39,27 @@ Gem::Specification.new do |s|
                    "project.yaml",
                    "riemann-monitors.gemspec"]
   s.homepage    = "https://github.com/riddochc/riemann-tools"
+  s.bindir      = "bin"
+  s.executables = ["riemann-kvminstance",
+                   "riemann-dir-files-count",
+                   "riemann-ntp",
+                   "riemann-diskstats",
+                   "riemann-dir-space",
+                   "riemann-net",
+                   "riemann-varnish",
+                   "riemann-apache-status",
+                   "riemann-consul",
+                   "riemann-haproxy",
+                   "riemann-freeswitch",
+                   "riemann-cloudant",
+                   "riemann-bench",
+                   "riemann-proc",
+                   "riemann-health",
+                   "riemann-zookeeper",
+                   "riemann-httpstatus",
+                   "riemann-memcached",
+                   "riemann-nginx-status",
+                   "riemann-fd"]
 
   s.add_dependency "riemann-ruby-experiments", ">= 0.0.2"
   s.add_dependency "trollop", ">= 1.16.2"
