@@ -2,7 +2,7 @@
 Chris Riddoch <riddochc@gmail.com>
 :language: ruby
 :homepage: https://github.com/riddochc/riemann-tools
-:revnumber: 0.1
+:revnumber: 0.0.1
 :revdate: 2016-05-29
 
 == Description

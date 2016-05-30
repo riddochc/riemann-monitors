@@ -3,4 +3,6 @@ require 'openssl'
 require 'trollop'
 require 'json'
 
-require_relative 'riemann/monitors'
+require_relative 'riemann-monitors/version'
+require_relative 'riemann-monitors/main'
+

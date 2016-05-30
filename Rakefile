@@ -1,7 +1,5 @@
 # vim: syntax=ruby
 
-require "rake/extensiontask"
-
 require 'yaml'
 require 'find'
 require 'asciidoctor'
@@ -16,7 +14,7 @@ end
 
 def filtered_project_files()
   Dir.chdir __dir__ do
-    Find.find(".").reject {|f| !File.file?(f) || f =~ %r{^\./(.git|tmp)} || f =~ %r{\.so$} }.map {|f| f.sub %r{^\./}, '' }
+    Find.find(".").reject {|f| !File.file?(f) || f =~ %r{^\./(.git|tmp)} || f =~ %r{\.(so|gem)$} }.map {|f| f.sub %r{^\./}, '' }
   end
 end
 
@@ -55,7 +53,6 @@ Gem::Specification.new do |s|
   s.date        = "<%= Date.today %>"
   s.files       = [<%= all_files.map{|f| '"' + f + '"' }.join(",\n                   ") %>]
   s.homepage    = "<%= adoc.attributes['homepage'] %>"
-  s.extensions  = ["ext/<%= project.gsub(/-/, '_') %>_ext/extconf.rb"]
 
 % dependencies.each_pair do |req, vers|
   s.add_dependency "<%= req %>", "<%= vers %>"
@@ -67,7 +64,7 @@ Gem::Specification.new do |s|
 end
 GEMSPEC
 
-task default: [:gen_version, :gemspec, :build]
+task default: [:gen_version, :gemspec, :gemfile, :build]
 
 task :gen_version do
   File.open(File.join("lib", project, "version.rb"), 'w') {|f|
@@ -106,7 +103,14 @@ task :gemspec => [:gen_version] do
   end
 end
 
-task :build => [:gemspec, :compile] do
+task :gemfile do
+  File.open("Gemfile", 'w') do |f|
+    f.puts "source 'https://rubygems.org"
+    f.puts "gemspec"
+  end
+end
+
+task :build => [:clean, :gemspec, :gemfile] do
   system "gem build #{project}.gemspec"
 end
 
@@ -116,6 +120,4 @@ end
 
 task :clean do
   rm_f "./#{project}-#{version}.gem"
-  rm_f "./lib/#{project.gsub(/-/, '_')}_ext.so"
-  rm_rf "tmp"
 end
