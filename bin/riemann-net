@@ -2,67 +2,39 @@
 
 # Gathers network interface statistics and submits them to Riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require "pry"
+require_relative "../lib/riemann-monitors"
+require 'set'
 
 class Riemann::Monitors::Net
   include Riemann::Monitors
 
-  opt :interfaces, "Interfaces to monitor", :type => :strings, :default => nil
+  opt :interfaces, "Interfaces to monitor", :type => :strings, :default => []
   opt :ignore_interfaces, "Interfaces to ignore", :type => :strings, :default =>['lo']
 
   def initialize
     @old_state = nil
-    @interfaces = opts[:interfaces].map(&:dup) if opts[:interfaces]
-    @ignore_interfaces = opts[:ignore_interfaces].map(&:dup)
+    @fields = ["rx bytes", "rx packets", "rx errs", "rx drop", "rx fifo", "rx frame", "rx compressed", "rx multicast",
+               "tx bytes", "tx packets", "tx errs", "tx drops", "tx fifo", "tx colls", "tx carrier", "tx compressed"]
+    @use_interfaces = Set.new(opts[:interfaces])
+    @ignore_interfaces = Set.new(opts[:ignore_interfaces])
   end
 
   def state
-    f = File.read('/proc/net/dev')
-    state = f.split("\n").inject({}) do |s, line|
-      if line =~ /\s*(\w+?):\s*([\s\d]+)\s*/
-        iface = $1
+    net = File.open("/proc/net/dev", "r")
+    net.readline ; net.readline  # Skip first two lines.
 
-        ['rx bytes',
-        'rx packets',
-        'rx errs',
-        'rx drop',
-        'rx fifo',
-        'rx frame',
-        'rx compressed',
-        'rx multicast',
-        'tx bytes',
-        'tx packets',
-        'tx errs',
-        'tx drops',
-        'tx fifo',
-        'tx colls',
-        'tx carrier',
-        'tx compressed'].map do |service|
-          "#{iface} #{service}"
-        end.zip(
-          $2.split(/\s+/).map { |str| str.to_i }
-        ).each do |service, value|
-          s[service] = value
-        end
-      end
-      
-      s
-    end
-
-    # Filter interfaces
-    if is = @interfaces
-      state = state.select do |service, value|
-        is.include? service.split(' ').first
+    metrics = {}
+    net.readlines.each do |line|
+      interface = line[/^[^:]+/]
+      if @use_interfaces.include?(interface) && !@ignore_interfaces.include?(interface)
+        metrics[interface] = @fields.zip(line.split(/\s+/).drop(1).map(&:to_i)).to_h
       end
     end
-
-    state = state.reject do |service, value|
-      @ignore_interfaces.include? service.split(' ').first
-    end
-
-    state
+    metrics
   end
-  
+
+  # TODO
   def tick
     state = self.state
 
