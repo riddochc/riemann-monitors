@@ -2,106 +2,129 @@
 
 # Reports running process count to riemann.
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+require 'pry'
+require 'set'
+require_relative "../lib/riemann-monitors"
+
+# $clk_tck = Etc.sysconf(2).to_f
+
+ProcessInfo = Struct.new(:pid, :comm, :oldfields, :newfields) do
+  def riemann_statemap(state)
+    statemap = {"R" => "ok",
+                "S" => "ok",
+                "I" => "warning",
+                "T" => "critical",
+                "U" => "critical",
+                "Z" => "critical"}
+    statemap.default = "unknown"
+    statemap[state]
+  end
+
+  def fields
+    @sorted_fields ||= (oldfields + newfields).sort
+  end
+
+  # def time_of(field)
+  #   fields.assoc(field).last / $clk_tck
+  # end
+
+  def summarize()
+    fields.each do |name, metric|
+      params = {}
+      params[:service] = "process.#{pid}"
+      params[:description] = name
+      params[:pname] = comm
+      if name == "State"
+        params[:state] = riemann_statemap(metric)
+        params[:value] = metric
+      # elsif name.end_with?("time")
+      #   params[:metric] = time_of(name)
+      elsif metric.is_a?(Numeric)
+        params[:metric] = metric
+      else
+        params[:value] = metric
+      end
+      yield(params)
+    end
+  end
+end
 
 class Riemann::Monitors::Proc
   include Riemann::Monitors
 
-  opt :proc_regex, "regular expression that matches the process to be monitored", type: :string, :default => ".*"
-  opt :proc_min_critical, "running process count minimum", :default => 0
-  opt :proc_max_critical, "running process count maximum", :default => 65536
+  opt(:proc_regex, "regular expression that matches the process to be monitored", type: :string, default: ".*")
+  opt(:newstats, "fields from /proc/#/status to collect (always includes name and status character)", multi: :strings,
+      default: ["VmRSS", "VmSize", "VmPeak", "VmHWM", "VmLib", "VmSwap", "Threads"])
+  opt(:oldstats, "fields from /proc/#/status to collect (use names from proc(5) manpage)", multi: :strings, default: ["utime", "stime"])
+  opt(:metricfield, "field to assign to metric", default: "VmRSS")
+  opt(:proc_min_critical, "running process count minimum", :default => 0)
+  opt(:proc_max_critical, "running process count maximum", :default => 65536)
 
   def initialize
-    @limits = { :critical => { :min => opts[:proc_min_critical], :max => opts[:proc_max_critical] } }
+    @process_regex = Regexp.new(opts[:proc_regex])
+    @newfields = Set.new(opts[:newstats]).add("Name").add("State")
+    @oldfields = Set.new(opts[:oldstats])
+    @allstatfields = File.readlines(File.join(__dir__, "..", "data", "statfields")).map(&:chomp)
+
+    @limits = { :critical => Range.new(opts[:proc_min_critical], opts[:proc_max_critical]) }
 
     abort "FATAL: specify a process regular expression, see --help for usage" unless opts[:proc_regex]
-
-    ostype = `uname -s`.chomp.downcase
-    puts "WARNING: OS '#{ostype}' not explicitly supported. Falling back to Linux" unless ostype == "linux"
-    @check = method :linux_proc
-  end
-
-  def alert(service, state, metric, description)
-    report(
-      :service => service.to_s,
-      :state => state.to_s,
-      :metric => metric.to_f,
-      :description => description
-    )
-  end
-
-  def linux_proc
-    process = opts[:proc_regex]
-    found = `ps axo pid=,rss=,vsize=,state=,cputime=,lstart=,command= | grep '#{process}' | grep -v grep | grep -v riemann-proc`
-    running = found.count("\n")
-    if running > @limits[:critical][:max] or running < @limits[:critical][:min]
-      alert "proc count/#{process}", :critical, running, "process #{process} is running #{running} instances.\n"
-    else
-      alert "proc count/#{process}", :ok, running, "process #{process} is running #{running} instances.\n"
-    end
-    # Iterate on all the lines and create an entry for the following metrics:
-    #
-    # process/<pid>-<start-time>/rss
-    # process/<pid>-<start-time>/vsize
-    # process/<pid>-<start-time>/running
-    # process/<pid>-<start-time>/cputime
-    #
-    # description should contain the command itself.
-    # value should be either process RSS, VSIZE, or 1 if running
-    # state is always unknown for the moment
-    #
-    ps_regex = /([0-9]+)[ ]+([0-9]+)[ ]+([0-9]+)[ ]+([A-Z])[ ]+([0-9:.]+)[ ]+[A-Za-z]{3}[ ]+([A-Za-z]{3} [0-9]+ [0-9:]+ [0-9]+)[ ]+(.*)/
-    found.each_line do |line|
-      m = ps_regex.match(line)
-      if not m.nil?
-        pid, rss, vsize, state, cputime, start, command = m.captures
-        start_s = DateTime.parse(start, "Mmm DD HH:MM:ss YYYY").to_time.to_i
-        cputime_s = DateTime.parse(cputime, "%H:%M:%S")
-        cputime_seconds = (cputime_s.hour * 3600) + (cputime_s.minute * 60) + cputime_s.second
-        running = 0
-        case state[0]
-        when "R"
-          state_s = "ok"
-          running = 1
-        when "S"
-          state_s = "ok"
-        when "I"
-          state_s = "warning"
-        when "T", "U", "Z"
-          state_s = "critical"
-        else
-          state_s = "unknown"
-        end
-        report(
-          :service => "proc #{pid}-#{start_s}/rss",
-          :state => state_s.to_s,
-          :metric => rss.to_f,
-          :description => command,
-        )
-        report(
-          :service => "proc #{pid}-#{start_s}/vsize",
-          :state => state_s.to_s,
-          :metric => vsize.to_f,
-          :description => command,
-        )
-        report(
-          :service => "proc #{pid}-#{start_s}/running",
-          :state => state_s.to_s,
-          :metric => running.to_f,
-          :description => command,
-        )
-        report(
-          :service => "proc #{pid}-#{start_s}/cputime",
-          :state => state_s.to_s,
-          :metric => cputime_seconds,
-          :description => command,
-        )
-      end
-    end
   end
 
   def tick
-    @check.call
+    @sample_start = Time.now
+
+    processes = Dir.glob("/proc/[0-9]*/comm").map {|cfile|
+      pid = cfile[/\d+/].to_i
+      comm = File.read(cfile).chomp
+      if @process_regex.match(comm)
+        p = ProcessInfo.new()
+        p.pid = pid
+        p.comm = comm
+        p
+      end
+    }.compact
+
+    processes.each {|p|
+      p.newfields = File.readlines("/proc/#{p.pid}/status") \
+                        .map {|line| parts = line.split(/\s+/)
+                                name, rest = parts[0].chop, parts[1..-1]
+                                if @newfields.include?(name)
+                                  value = rest&.first
+                                  if rest.length > 2
+                                    value = rest.join("\t")
+                                  elsif value[/\A\d+\z/]
+                                    value = value.to_i
+                                  end
+                                  [name, value]
+                                end
+                        }.compact
+    }
+
+    processes.each {|p|
+      statstr = File.read("/proc/#{p.pid}/stat")
+      stat_tail = statstr.reverse[/[-0-9 ]+/].reverse.split(" ").map {|n| n.to_i }
+      p.oldfields = @allstatfields.zip(stat_tail).select {|name, value| @oldfields.include?(name) }
+    }
+    @sample_end = Time.now
+
+    report(service: "process.samplerate", state: "ok", metric: (@sample_end.to_f - @sample_start.to_f), time: @sample_end)
+
+    processes.group_by {|p| p.comm }.map do |pname, ps|
+      running = ps.count
+      if @limits[:critical].cover?(running)
+        report(service: "process.instances", state: "ok", description: pname, metric: running)
+      else
+        report(service: "process.instances", state: "critical", description: pname, metric: running)
+      end
+    end
+
+    processes.each do |p|
+      p.summarize do |point|
+        point[:time] = @sample_end
+        report(point)
+      end
+    end
   end
 end
 
