@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
                    "lib/riemann-monitors.rb",
                    "project.yaml",
                    "riemann-monitors.gemspec"]
-  s.homepage    = "https://github.com/riddochc/riemann-tools"
+  s.homepage    = "https://github.com/riddochc/riemann-monitors"
   s.bindir      = "bin"
   s.executables = ["riemann-kvminstance",
                    "riemann-dir-files-count",

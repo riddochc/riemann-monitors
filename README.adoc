@@ -1,7 +1,7 @@
 = riemann-monitors
 Chris Riddoch <riddochc@gmail.com>
 :language: ruby
-:homepage: https://github.com/riddochc/riemann-tools
+:homepage: https://github.com/riddochc/riemann-monitors
 :revnumber: 0.0.1
 :revdate: 2016-05-29
 
