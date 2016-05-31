@@ -12,8 +12,8 @@ Tiny programs to submit events to Riemann.
 This is a polite fork of riemann-tools, using my riemann-ruby-experiments gem
 instead of riemann-ruby-client.  As a result, events can be batched together
 to be sent in one message to a Riemann server.  Additionally, more control
-over the TCP socket options is given, and UDP is less supported as a result
-of that gem's use of net_ruby_client.
+over the TCP socket options is given, and UDP isn't supported (yet?), because
+this gem primarily uses net_ruby_client.
 
 == Requirements
 
