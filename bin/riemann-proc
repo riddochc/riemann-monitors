@@ -31,7 +31,7 @@ ProcessInfo = Struct.new(:pid, :comm, :oldfields, :newfields) do
   def summarize()
     fields.each do |name, metric|
       params = {}
-      params[:service] = "process.#{pid}"
+      params[:service] = "process;#{pid};#{name}"
       params[:description] = name
       params[:pname] = comm
       if name == "State"
