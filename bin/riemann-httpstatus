@@ -29,8 +29,9 @@ class Riemann::Monitors::HTTPStatus
   def tick
     response, roundtrip = get_connection()
     unless (response).nil?
-      metrics = {:service => @servicename,
-                 :tags => ["http"]}
+      metrics = {service: @servicename,
+                 description: @sitename,
+                 tags:  ["http"]}
       c = response.code&.to_i
       if !c.nil?
         metrics[:state] = "ok"
