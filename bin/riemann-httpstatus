@@ -8,13 +8,13 @@ class Riemann::Monitors::HTTPStatus
   require "net/http"
   require "uri"
 
-  opt :uri, "Target URI", default: 'http://localhost/'
+  opt :uri, "Target URI", type: String, default: 'http://localhost/'
   opt :sitename, "Site name (abbreviation for identifying uri)", type: String
-  opt :method, "HTTP Method (get, head)", default: "head"
+  opt :method, "HTTP Method (get, head)", type: String, default: "head"
 
   def initialize
     @uri = URI.parse(opts[:uri])
-    @sitename = opts[:sitename].gsub(/\//, '_')
+    @sitename = opts[:sitename]&.gsub(/\//, '_') if opts.has_key?(:sitename)
     @servicename = ["http", opts[:method], @sitename].join("/")
     @verbclass = case opts[:method]
     when /\Aget\z/i
