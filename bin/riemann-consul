@@ -2,7 +2,11 @@
 
 # Reports service and node status to riemann
 
-require File.expand_path('../../lib/riemann/tools', __FILE__)
+$application = File.basename($0).gsub(/\.[^.]+$/, '')
+
+$:.unshift(File.expand_path(File.join(__dir__, '..', 'lib')))
+require $application
+
 require 'socket'
 require 'net/http'
 require 'uri'
